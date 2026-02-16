@@ -22,6 +22,14 @@ flock -n 9 || exit 0
 
 dir_hash() {
   local dir="$1"
+  [ -d "$dir" ] || { echo "none"; return; }
+
+  find "$dir" -type f -print0 \
+    ! -path "*/__pycache__/*" \
+    ! -name "*.pyc" \
+    ! -name "*.pyo" \
+    -print0 \
+    | sort -z \
     | xargs -0 sha256sum \
     | sha256sum \
     | awk '{print $1}'
