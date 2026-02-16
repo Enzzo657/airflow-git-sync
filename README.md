@@ -7,14 +7,6 @@
 </p>
 
 
-## Table of Contents 🏗️
-
-- [Airflow Git Sync](#airflow-git-sync)
-  - [Table of Contents 🏗️](#table-of-contents-️)
-  - [Project Description 🌱](#project-description-)
-  - [Project Usage 🧑‍💻](#project-usage-)
-  - [License 📄](#license-)
-
 ## Project Description 🌱
 
 The airflow-git-sync script ensures that the local repo is identical to the remote one, updates are independent of commit history, and can work with squash, rebase, and git push --force. It also has a trigger: when the plugins directory in the repository changes, it restarts the airflow services.
