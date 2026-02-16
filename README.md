@@ -41,7 +41,7 @@ sudo docker compose up -d
 ```
 With the required variables:
 
-| Variable | Description |
+    | Variable | Description |
     | --- | --- |
     | `REPO_URL` | The URL of the Git repository to sync |
     | `SYNC_ROOT` | A directory inside the container for storing the repository |
