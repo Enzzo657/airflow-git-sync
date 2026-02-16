@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  airflow-git-sync:
+    image: enzzo657/airflow-git-sync:latest
+    container_name: airflow-git-sync
+    environment:
+      REPO_URL: https://<access_token_name>:<token>@gitlab.com/<group>/<project>.git
+      GIT_BRANCH: master
+      SYNC_ROOT: /opt/sync
+      AIRFLOW_RESTART_SERVICES: scheduler apiserver dag-processor triggerer
+      SYNC_INTERVAL: 20
+    volumes:
+      - ./repo:/opt/sync
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "test", "-f", "/opt/sync/.git/HEAD"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
