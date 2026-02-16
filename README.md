@@ -40,7 +40,6 @@ so that git-sync has time to pick up the repository
 sudo docker compose up -d
 ```
 With the required variables:
-
     | Variable | Description |
     | --- | --- |
     | `REPO_URL` | The URL of the Git repository to sync |
