@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#09090f" />
+    <meta
+      name="description"
+      content="Automatically sync Airflow DAGs from Git. A lightweight Docker companion with history-independent updates and plugin-triggered container restarts."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Airflow Git Sync" />
+    <meta
+      property="og:title"
+      content="Airflow Git Sync — Keep your DAGs in sync"
+    />
+    <meta
+      property="og:description"
+      content="Git to Airflow, automatically. Explore the workflow, Docker Compose quick start, and environment configuration."
+    />
+    <meta
+      property="og:url"
+      content="https://opsmon.github.io/airflow-git-sync/"
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <link rel="canonical" href="https://opsmon.github.io/airflow-git-sync/" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./script.js" defer></script>
+    <title>Airflow Git Sync — Keep your DAGs in sync</title>
+  </head>
+  <body>
+    <a data-i18n="skip" class="skip-link" href="#main">Skip to content</a>
+    <header class="header">
+      <div class="container header-inner">
+        <a class="brand" href="#overview"
+          ><svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path
+              d="M8 9h13l-4-4M24 23H11l4 4M24 9v8M8 23v-8"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="8" cy="9" r="3" fill="currentColor" />
+            <circle cx="24" cy="23" r="3" fill="currentColor" /></svg
+          ><span>Airflow <strong>Git Sync</strong></span></a
+        >
+        <nav class="desktop-nav">
+          <a href="#overview"><span data-i18n="navOverview">Overview</span></a
+          ><a href="#how-it-works"
+            ><span data-i18n="navHow">How it works</span></a
+          ><a href="#quick-start"
+            ><span data-i18n="navStart">Quick Start</span></a
+          ><a href="#configuration"
+            ><span data-i18n="navConfig">Configuration</span></a
+          >
+        </nav>
+        <div class="header-actions">
+          <div
+            class="language-switch"
+            role="group"
+            aria-label="Language / Язык"
+          >
+            <button type="button" data-lang="en" aria-pressed="true" lang="en">
+              EN</button
+            ><span aria-hidden="true">/</span
+            ><button
+              type="button"
+              data-lang="ru"
+              aria-pressed="false"
+              lang="ru"
+            >
+              RU
+            </button>
+          </div>
+          <a
+            class="github-header"
+            href="https://github.com/Enzzo657/airflow-git-sync"
+            >GitHub <span aria-hidden="true">↗</span></a
+          ><button
+            class="menu-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+          >
+            <span data-i18n="menu">Menu</span>
+            <span aria-hidden="true">☰</span>
+          </button>
+        </div>
+      </div>
+      <nav class="mobile-nav" id="mobile-nav" hidden>
+        <a href="#overview"><span data-i18n="navOverview">Overview</span></a
+        ><a href="#how-it-works"><span data-i18n="navHow">How it works</span></a
+        ><a href="#quick-start"><span data-i18n="navStart">Quick Start</span></a
+        ><a href="#configuration"
+          ><span data-i18n="navConfig">Configuration</span></a
+        ><a href="https://github.com/Enzzo657/airflow-git-sync">GitHub ↗</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero container" id="overview">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="status-dot"></span
+            ><span data-i18n="eyebrow">GIT → AIRFLOW. AUTOMATED.</span>
+          </div>
+          <h1>
+            <span data-i18n="headline1">Your DAGs.</span><br /><span
+              data-i18n="headline2"
+              >Your Git.</span
+            ><br /><span data-i18n="headline3" class="gradient-text"
+              >Always in sync.</span
+            >
+          </h1>
+          <p data-i18n="heroText" class="hero-description">
+            Keep Airflow DAGs and plugins in sync with Git. Deliver repository
+            updates automatically, with service restarts when plugins change.
+          </p>
+          <div class="button-row">
+            <a class="button primary" href="#quick-start"
+              ><span data-i18n="getStarted">Get started</span>
+              <span aria-hidden="true">→</span></a
+            ><a
+              class="button secondary"
+              href="https://github.com/Enzzo657/airflow-git-sync"
+              ><span data-i18n="viewGithub">View on GitHub</span>
+              <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="badges">
+            <span>Docker</span><span>Apache Airflow</span><span>Git Sync</span
+            ><span><span data-i18n="openSource">Open source</span></span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="visual-top">
+            <span class="mono">airflow-git-sync</span
+            ><span class="visual-label"
+              ><span data-i18n="syncFlow">SYNC FLOW</span></span
+            >
+          </div>
+          <div class="pipeline-node git-node">
+            <span class="node-icon" aria-hidden="true">⑂</span>
+            <div>
+              <strong
+                ><span data-i18n="gitRepository">Git repository</span></strong
+              ><small class="mono">origin / GIT_BRANCH</small>
+            </div>
+            <span class="node-tag">Git</span>
+          </div>
+          <div class="connector"><span>git fetch · reset --hard</span></div>
+          <div class="pipeline-node sync-node">
+            <svg
+              class="logo"
+              viewBox="0 0 32 32"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M8 9h13l-4-4M24 23H11l4 4M24 9v8M8 23v-8"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="8" cy="9" r="3" fill="currentColor" />
+              <circle cx="24" cy="23" r="3" fill="currentColor" />
+            </svg>
+            <div>
+              <strong>Airflow Git Sync</strong
+              ><small
+                ><span data-i18n="dockerCompanion"
+                  >Your Docker sync companion</span
+                ></small
+              >
+            </div>
+            <span class="status-dot"></span>
+          </div>
+          <div class="split-lines" aria-hidden="true"></div>
+          <div class="output-nodes">
+            <div class="output-node">
+              <span class="file-icon" aria-hidden="true">⌘</span
+              ><strong>DAGs</strong
+              ><small
+                ><span data-i18n="repoUpdates">Repository updates</span></small
+              >
+            </div>
+            <div class="output-node">
+              <span class="file-icon" aria-hidden="true">◇</span
+              ><strong>Plugins</strong
+              ><small
+                ><span data-i18n="restartOnChange"
+                  >Restart on change</span
+                ></small
+              >
+            </div>
+          </div>
+          <div class="visual-footer">
+            <span class="loop-symbol" aria-hidden="true">↻</span
+            ><span
+              ><span data-i18n="intervalLabel"
+                >Repeat every SYNC_INTERVAL seconds</span
+              ></span
+            >
+          </div>
+        </div>
+      </section>
+      <div class="container hero-command">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="terminal-dots" aria-hidden="true"
+              ><i></i><i></i><i></i></span
+            ><span>bash</span
+            ><button class="copy" type="button">
+              <span data-i18n="copy">Copy</span>
+            </button>
+          </div>
+          <pre
+            tabindex="0"
+            role="region"
+            aria-label="Code example"
+          ><code>docker pull enzzo657/airflow-git-sync:latest</code></pre>
+        </div>
+        <p data-i18n="heroNote">
+          One container. One branch. A repeatable sync loop.
+        </p>
+      </div>
+      <section class="section container" aria-labelledby="less-title">
+        <div class="section-heading">
+          <div>
+            <p data-i18n="overviewLabel" class="eyebrow">01 / OVERVIEW</p>
+            <h2 data-i18n="lessTitle" id="less-title">
+              Less manual work. More flow.
+            </h2>
+          </div>
+          <p data-i18n="lessText">
+            A Git push should move your code forward. Let a dedicated container
+            handle the repository sync.
+          </p>
+        </div>
+        <div class="comparison">
+          <div class="flow-row old-flow">
+            <div data-i18n="manualWorkflow" class="flow-label">
+              A manual workflow
+            </div>
+            <div class="flow-steps">
+              <span>git push</span><b aria-hidden="true">→</b
+              ><span
+                ><span data-i18n="manualUpdate">Manual DAG update</span></span
+              ><b aria-hidden="true">→</b
+              ><span
+                ><span data-i18n="manualSync"
+                  >Manual synchronization</span
+                ></span
+              ><b aria-hidden="true">→</b><span>Airflow</span>
+            </div>
+          </div>
+          <div class="flow-row new-flow">
+            <div data-i18n="withSync" class="flow-label">
+              With Airflow Git Sync
+            </div>
+            <div class="flow-steps">
+              <span>git push</span><b aria-hidden="true">→</b
+              ><span class="flow-highlight"
+                ><svg
+                  class="logo"
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M8 9h13l-4-4M24 23H11l4 4M24 9v8M8 23v-8"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <circle cx="8" cy="9" r="3" fill="currentColor" />
+                  <circle cx="24" cy="23" r="3" fill="currentColor" />
+                </svg>
+                Airflow Git Sync</span
+              ><b aria-hidden="true">→</b><span>Airflow</span>
+            </div>
+          </div>
+        </div>
+        <div class="features">
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">↻</span>
+            <h3 data-i18n="featureTitle0">Automatic Git sync</h3>
+            <p data-i18n="featureText0">
+              Fetch the remote branch on a configurable interval. Keep tracked
+              files aligned with Git.
+            </p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">⑂</span>
+            <h3 data-i18n="featureTitle1">Your history. Your workflow.</h3>
+            <p data-i18n="featureText1">
+              Hard reset to the remote branch supports regular commits, squash,
+              rebase, and force-push.
+            </p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">◇</span>
+            <h3 data-i18n="featureTitle2">Plugin change detection</h3>
+            <p data-i18n="featureText2">
+              Compare hashes of the plugins directory before and after
+              synchronization.
+            </p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">↗</span>
+            <h3 data-i18n="featureTitle3">Targeted container restarts</h3>
+            <p data-i18n="featureText3">
+              Restart the configured Airflow containers when the plugin
+              directory hash changes.
+            </p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">▣</span>
+            <h3 data-i18n="featureTitle4">At home in Docker</h3>
+            <p data-i18n="featureText4">
+              Run alongside Airflow with a shared repository mount and a Compose
+              healthcheck.
+            </p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">⌘</span>
+            <h3 data-i18n="featureTitle5">Five environment variables</h3>
+            <p data-i18n="featureText5">
+              Set the repository, branch, local path, polling interval, and
+              containers to restart.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="section architecture-section" id="how-it-works">
+        <div class="container architecture-layout">
+          <div>
+            <p data-i18n="howLabel" class="eyebrow">02 / UNDER THE HOOD</p>
+            <h2 data-i18n="howTitle">A small loop. A clear pipeline.</h2>
+            <p data-i18n="howText" class="section-description">
+              Clone on the first run. Fetch, reset, and clean on each pass. Then
+              compare the plugin hashes and restart containers if needed.
+            </p>
+            <div class="source-note">
+              <span class="mono">fetch → reset → clean → compare</span
+              ><a
+                href="https://github.com/Enzzo657/airflow-git-sync/blob/main/docker/redeploy.sh"
+                ><span data-i18n="readScript">Read the sync script</span> ↗</a
+              >
+            </div>
+          </div>
+          <div class="architecture">
+            <div class="arch-node">
+              <span data-i18n="gitRepository">Git repository</span>
+              <span class="mono">origin</span>
+            </div>
+            <div class="arch-line">
+              <span data-i18n="periodicSync">periodic sync</span>
+            </div>
+            <div class="arch-node highlighted">
+              <svg
+                class="logo"
+                viewBox="0 0 32 32"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M8 9h13l-4-4M24 23H11l4 4M24 9v8M8 23v-8"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <circle cx="8" cy="9" r="3" fill="currentColor" />
+                <circle cx="24" cy="23" r="3" fill="currentColor" />
+              </svg>
+              Airflow Git Sync
+            </div>
+            <div class="arch-fork">
+              <div>
+                <div class="arch-line" aria-hidden="true">↓</div>
+                <div class="arch-node">DAGs</div>
+                <div class="arch-line">
+                  <span data-i18n="sharedFiles">shared files</span>
+                </div>
+                <div class="arch-node muted-node">Airflow</div>
+              </div>
+              <div>
+                <div class="arch-line" aria-hidden="true">↓</div>
+                <div class="arch-node">Plugins</div>
+                <div class="arch-line">
+                  <span data-i18n="ifChanged">if changed → restart</span>
+                </div>
+                <div class="arch-node muted-node">
+                  <span data-i18n="airflowServices">Airflow containers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section container" id="quick-start">
+        <p data-i18n="startLabel" class="eyebrow">03 / QUICK START</p>
+        <div class="section-heading">
+          <div>
+            <h2 data-i18n="startTitle">From Git to DAGs.</h2>
+            <p data-i18n="startIntro">
+              Add a sync companion to your existing Airflow stack.
+            </p>
+          </div>
+          <a
+            class="text-link"
+            href="https://github.com/Enzzo657/airflow-git-sync/blob/main/docker-compose.yml"
+            ><span data-i18n="composeSource">Original Compose example</span>
+            ↗</a
+          >
+        </div>
+        <div class="quick-steps">
+          <article class="quick-step">
+            <div class="step-description">
+              <span class="step-number">01</span>
+              <h3 data-i18n="pullTitle">Pull the image</h3>
+              <p data-i18n="pullText">
+                Use the published Docker image from the project README. Docker
+                with Compose is required.
+              </p>
+            </div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <span class="terminal-dots" aria-hidden="true"
+                  ><i></i><i></i><i></i></span
+                ><span>bash</span
+                ><button class="copy" type="button">
+                  <span data-i18n="copy">Copy</span>
+                </button>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Code example"
+              ><code>docker pull enzzo657/airflow-git-sync:latest</code></pre>
+            </div>
+          </article>
+          <article class="quick-step">
+            <div class="step-description">
+              <span class="step-number">02</span>
+              <h3 data-i18n="composeTitle">Add the sync service</h3>
+              <p data-i18n="composeText">
+                Merge this service into your Airflow Compose file. This adapts
+                the repository example to read your settings from a local .env
+                file.
+              </p>
+              <p data-i18n="socketNote" class="note">
+                The Docker socket mount lets the container restart other
+                containers on the host. Mount ./repo into Airflow too, with DAG
+                and plugin paths matching your repository layout.
+              </p>
+            </div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <span class="terminal-dots" aria-hidden="true"
+                  ><i></i><i></i><i></i></span
+                ><span>docker-compose.yml</span
+                ><button class="copy" type="button">
+                  <span data-i18n="copy">Copy</span>
+                </button>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Code example"
+              ><code>services:
+  airflow-git-sync:
+    image: enzzo657/airflow-git-sync:latest
+    container_name: airflow-git-sync
+    environment:
+      REPO_URL: ${REPO_URL:?Set REPO_URL}
+      GIT_BRANCH: ${GIT_BRANCH:-master}
+      SYNC_ROOT: /opt/sync
+      AIRFLOW_RESTART_SERVICES: ${AIRFLOW_RESTART_SERVICES:?Set container names}
+      SYNC_INTERVAL: 20
+    volumes:
+      - ./repo:/opt/sync
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: [&quot;CMD&quot;, &quot;test&quot;, &quot;-f&quot;, &quot;/opt/sync/.git/HEAD&quot;]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped</code></pre>
+            </div>
+          </article>
+          <article class="quick-step">
+            <div class="step-description">
+              <span class="step-number">03</span>
+              <h3 data-i18n="envTitle">Set your environment</h3>
+              <p data-i18n="envText">
+                Create .env next to the Compose file. Replace the URL, branch,
+                and container names with your values. AIRFLOW_RESTART_SERVICES
+                uses space-separated Docker container names, not Compose service
+                keys.
+              </p>
+              <p data-i18n="authNote" class="note">
+                For a private repository, provide a URL with credentials as in
+                the upstream example. Keep credentials out of version control.
+              </p>
+            </div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <span class="terminal-dots" aria-hidden="true"
+                  ><i></i><i></i><i></i></span
+                ><span>.env</span
+                ><button class="copy" type="button">
+                  <span data-i18n="copy">Copy</span>
+                </button>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Code example"
+              ><code>REPO_URL=https://github.com/your-org/your-airflow-dags.git
+GIT_BRANCH=main
+AIRFLOW_RESTART_SERVICES=airflow-airflow-scheduler-1 airflow-airflow-worker-1</code></pre>
+            </div>
+          </article>
+          <article class="quick-step">
+            <div class="step-description">
+              <span class="step-number">04</span>
+              <h3 data-i18n="runTitle">Wait for Git. Start Airflow.</h3>
+              <p data-i18n="runText">
+                Add this dependency to each Airflow service that reads the
+                repository. Preserve its existing dependencies. The healthcheck
+                waits for .git/HEAD; it does not validate DAGs. Then start the
+                stack.
+              </p>
+            </div>
+            <div>
+              <div class="terminal">
+                <div class="terminal-bar">
+                  <span class="terminal-dots" aria-hidden="true"
+                    ><i></i><i></i><i></i></span
+                  ><span>docker-compose.yml · Airflow</span
+                  ><button class="copy" type="button">
+                    <span data-i18n="copy">Copy</span>
+                  </button>
+                </div>
+                <pre
+                  tabindex="0"
+                  role="region"
+                  aria-label="Code example"
+                ><code>depends_on:
+  airflow-git-sync:
+    condition: service_healthy</code></pre>
+              </div>
+              <div class="terminal">
+                <div class="terminal-bar">
+                  <span class="terminal-dots" aria-hidden="true"
+                    ><i></i><i></i><i></i></span
+                  ><span>bash</span
+                  ><button class="copy" type="button">
+                    <span data-i18n="copy">Copy</span>
+                  </button>
+                </div>
+                <pre
+                  tabindex="0"
+                  role="region"
+                  aria-label="Code example"
+                ><code>docker compose up -d</code></pre>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="callout">
+          <span aria-hidden="true">↳</span>
+          <p data-i18n="syncCaution">
+            Use a dedicated checkout: synchronization resets tracked files and
+            removes untracked and ignored files, with Python cache exclusions in
+            the script. Keep local work outside SYNC_ROOT.
+          </p>
+        </div>
+      </section>
+      <section class="section container" id="configuration">
+        <p data-i18n="configLabel" class="eyebrow">04 / CONFIGURATION</p>
+        <div class="section-heading">
+          <div>
+            <h2 data-i18n="configTitle">Small config. Full control.</h2>
+            <p data-i18n="configIntro">
+              Four required values. One optional polling interval.
+            </p>
+          </div>
+          <span class="mono subtle" data-i18n="environment">ENVIRONMENT</span>
+        </div>
+        <div class="config-wrap">
+          <table>
+            <caption class="sr-only">
+              <span data-i18n="configCaption"
+                >Environment variable reference</span
+              >
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col"><span data-i18n="variable">Variable</span></th>
+                <th scope="col"><span data-i18n="default">Default</span></th>
+                <th scope="col">
+                  <span data-i18n="description">Description</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><code>REPO_URL</code></th>
+                <td>
+                  <span class="mobile-label"
+                    ><span data-i18n="default">Default</span>: </span
+                  ><span class="default-value"
+                    ><span data-i18n="required">Required</span></span
+                  >
+                </td>
+                <td>
+                  <span data-i18n="variable0"
+                    >Git repository URL. Must be accessible from the sync
+                    container.</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <th scope="row"><code>SYNC_ROOT</code></th>
+                <td>
+                  <span class="mobile-label"
+                    ><span data-i18n="default">Default</span>: </span
+                  ><span class="default-value"
+                    ><span data-i18n="required">Required</span></span
+                  >
+                </td>
+                <td>
+                  <span data-i18n="variable1"
+                    >Checkout directory inside the container. The Compose
+                    example uses /opt/sync, mounted from ./repo.</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <th scope="row"><code>GIT_BRANCH</code></th>
+                <td>
+                  <span class="mobile-label"
+                    ><span data-i18n="default">Default</span>: </span
+                  ><span class="default-value"
+                    ><span data-i18n="required">Required</span></span
+                  >
+                </td>
+                <td>
+                  <span data-i18n="variable2"
+                    >Remote branch to synchronize. The Compose example uses
+                    master; set your actual branch.</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <th scope="row"><code>SYNC_INTERVAL</code></th>
+                <td>
+                  <span class="mobile-label"
+                    ><span data-i18n="default">Default</span>: </span
+                  ><span class="default-value"><code>10</code></span>
+                </td>
+                <td>
+                  <span data-i18n="variable3"
+                    >Seconds to sleep after each sync completes. Optional; the
+                    Compose example sets 20 seconds.</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <th scope="row"><code>AIRFLOW_RESTART_SERVICES</code></th>
+                <td>
+                  <span class="mobile-label"
+                    ><span data-i18n="default">Default</span>: </span
+                  ><span class="default-value"
+                    ><span data-i18n="required">Required</span></span
+                  >
+                </td>
+                <td>
+                  <span data-i18n="variable4"
+                    >Space-separated Docker container names to restart when the
+                    plugins directory hash changes.</span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="section container workflow-section">
+        <p data-i18n="workflowLabel" class="eyebrow">
+          05 / THE EVERYDAY WORKFLOW
+        </p>
+        <h2 data-i18n="workflowTitle">
+          Push your code. The loop takes it from here.
+        </h2>
+        <ol class="workflow-list">
+          <li>
+            <span class="workflow-index">01</span
+            ><strong data-i18n="workflowName0">Developer</strong
+            ><small data-i18n="workflowDesc0">git push</small>
+          </li>
+          <li>
+            <span class="workflow-index">02</span
+            ><strong data-i18n="workflowName1">Git repository</strong
+            ><small data-i18n="workflowDesc1">Remote branch updated</small>
+          </li>
+          <li>
+            <span class="workflow-index">03</span
+            ><strong data-i18n="workflowName2">Airflow Git Sync</strong
+            ><small data-i18n="workflowDesc2">Next poll fetches changes</small>
+          </li>
+          <li>
+            <span class="workflow-index">04</span
+            ><strong data-i18n="workflowName3">Airflow</strong
+            ><small data-i18n="workflowDesc3"
+              >Reads the synchronized DAGs</small
+            >
+          </li>
+        </ol>
+        <div class="workflow-branch">
+          <span aria-hidden="true">↳</span
+          ><span data-i18n="workflowBranch"
+            >Plugins changed? The configured Airflow containers restart after
+            sync.</span
+          >
+        </div>
+      </section>
+      <section class="container community">
+        <div>
+          <p data-i18n="communityLabel" class="eyebrow">
+            OPEN SOURCE, FROM THE START
+          </p>
+          <h2 data-i18n="communityTitle">Small tool. Open possibilities.</h2>
+          <p data-i18n="communityText">
+            Read the code, report a bug, or contribute a change. Airflow Git
+            Sync is open source under the MIT license.
+          </p>
+        </div>
+        <div class="community-links">
+          <a
+            class="button primary"
+            href="https://github.com/Enzzo657/airflow-git-sync"
+            ><span data-i18n="viewSource">View source</span> ↗</a
+          ><a href="https://github.com/Enzzo657/airflow-git-sync/issues"
+            ><span data-i18n="reportIssue">Report an issue</span> ↗</a
+          ><a href="https://github.com/Enzzo657/airflow-git-sync/pulls"
+            ><span data-i18n="contribute">Contribute</span> ↗</a
+          >
+        </div>
+      </section>
+    </main>
+    <footer class="container footer">
+      <a class="brand" href="#overview"
+        ><svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path
+            d="M8 9h13l-4-4M24 23H11l4 4M24 9v8M8 23v-8"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle cx="8" cy="9" r="3" fill="currentColor" />
+          <circle cx="24" cy="23" r="3" fill="currentColor" /></svg
+        ><span>Airflow Git Sync</span></a
+      ><span
+        ><span data-i18n="footerLicense">Open source · MIT License</span></span
+      >
+      <div>
+        <a href="https://github.com/Enzzo657/airflow-git-sync/blob/main/LICENSE"
+          ><span data-i18n="license">License</span></a
+        ><a href="https://github.com/Enzzo657/airflow-git-sync">GitHub ↗</a>
+      </div>
+    </footer>
+    <p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
+  </body>
+</html>
