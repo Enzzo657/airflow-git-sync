@@ -1,3 +1,10 @@
 .idea
 .gigaide
 .DS_Store
+
+# Svelte documentation site
+docs/node_modules/
+docs/.svelte-kit/
+docs/build/
+docs/test-results/
+docs/playwright-report/

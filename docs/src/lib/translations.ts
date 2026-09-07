@@ -1,5 +1,4 @@
-"use strict";
-const translations = {
+export const translations = {
   en: {
     codeExample: "Code example",
     environment: "ENVIRONMENT",
@@ -127,6 +126,7 @@ const translations = {
     pageTitle: "Airflow Git Sync — Keep your DAGs in sync",
     metaDescription:
       "Automatically sync Airflow DAGs from Git. A lightweight Docker companion with history-independent updates and plugin-triggered container restarts.",
+    mainNavigation: "Main navigation",
   },
   ru: {
     codeExample: "Пример кода",
@@ -253,127 +253,7 @@ const translations = {
     pageTitle: "Airflow Git Sync — Синхронизация DAG’ов с Git",
     metaDescription:
       "Автоматическая синхронизация DAG’ов Airflow с Git. Docker-контейнер с обновлениями независимо от истории и перезапуском при изменении плагинов.",
+    mainNavigation: "Основная навигация",
   },
-};
-let language = "en";
-try {
-  if (localStorage.getItem("airflow-git-sync-language") === "ru")
-    language = "ru";
-} catch {}
-const menuButton = document.querySelector(".menu-toggle");
-const mobileNav = document.querySelector(".mobile-nav");
-function closeMenu() {
-  menuButton.setAttribute("aria-expanded", "false");
-  mobileNav.hidden = true;
-}
-function setLanguage(next) {
-  language = next === "ru" ? "ru" : "en";
-  document.documentElement.lang = language;
-  const strings = translations[language];
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    element.textContent = strings[element.dataset.i18n];
-  });
-  document.querySelectorAll("[data-lang]").forEach((button) => {
-    button.setAttribute(
-      "aria-pressed",
-      String(button.dataset.lang === language),
-    );
-  });
-  document.querySelectorAll("pre").forEach((region) => {
-    const name = region
-      .closest(".terminal")
-      .querySelector(".terminal-bar > span:nth-child(2)").textContent;
-    region.setAttribute("aria-label", `${strings.codeExample}: ${name}`);
-  });
-  document.title = strings.pageTitle;
-  document.querySelector('meta[name="description"]').content =
-    strings.metaDescription;
-  document.querySelector('meta[property="og:title"]').content =
-    strings.pageTitle;
-  document.querySelector('meta[property="og:description"]').content =
-    strings.metaDescription;
-  document.querySelector('meta[property="og:locale"]').content =
-    language === "ru" ? "ru_RU" : "en_US";
-  document.querySelector('meta[property="og:locale:alternate"]').content =
-    language === "ru" ? "en_US" : "ru_RU";
-  document
-    .querySelectorAll("nav")
-    .forEach((nav) =>
-      nav.setAttribute(
-        "aria-label",
-        language === "ru" ? "Основная навигация" : "Main navigation",
-      ),
-    );
-  document.getElementById("copy-status").textContent = "";
-  try {
-    localStorage.setItem("airflow-git-sync-language", language);
-  } catch {}
-}
-document.querySelectorAll("[data-lang]").forEach((button) => {
-  button.addEventListener("click", () => setLanguage(button.dataset.lang));
-});
-menuButton.addEventListener("click", () => {
-  const open = menuButton.getAttribute("aria-expanded") !== "true";
-  menuButton.setAttribute("aria-expanded", String(open));
-  mobileNav.hidden = !open;
-});
-mobileNav
-  .querySelectorAll("a")
-  .forEach((link) => link.addEventListener("click", closeMenu));
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !mobileNav.hidden) {
-    closeMenu();
-    menuButton.focus();
-  }
-});
-window.matchMedia("(min-width: 1081px)").addEventListener("change", (event) => {
-  if (event.matches) closeMenu();
-});
-document.querySelectorAll(".copy").forEach((button) => {
-  button.addEventListener("click", async () => {
-    const code = button.closest(".terminal").querySelector("code").textContent;
-    const label = button.querySelector("[data-i18n]");
-    try {
-      await navigator.clipboard.writeText(code);
-      label.textContent = translations[language].copied;
-      document.getElementById("copy-status").textContent =
-        translations[language].copied;
-      setTimeout(() => {
-        label.textContent = translations[language].copy;
-      }, 1800);
-    } catch {
-      label.textContent = translations[language].copyFailed;
-      document.getElementById("copy-status").textContent =
-        translations[language].copyFailed;
-      setTimeout(() => {
-        label.textContent = translations[language].copy;
-      }, 4000);
-    }
-  });
-});
-setLanguage(language);
-
-// Highlight a few useful shell/YAML tokens without changing copyable text.
-document.querySelectorAll("pre code").forEach((code) => {
-  const source = code.textContent;
-  const tokens =
-    /(^[ \t]*[\w-]+(?=:)|\$\{[^}\n]+\}|https?:\/\/[^\s]+|^docker(?= ))/gm;
-  const fragment = document.createDocumentFragment();
-  let cursor = 0;
-  for (const match of source.matchAll(tokens)) {
-    fragment.append(document.createTextNode(source.slice(cursor, match.index)));
-    const span = document.createElement("span");
-    span.className = match[0].startsWith("${")
-      ? "syntax-variable"
-      : match[0].startsWith("http")
-        ? "syntax-value"
-        : match[0] === "docker"
-          ? "syntax-command"
-          : "syntax-key";
-    span.textContent = match[0];
-    fragment.append(span);
-    cursor = match.index + match[0].length;
-  }
-  fragment.append(document.createTextNode(source.slice(cursor)));
-  code.replaceChildren(fragment);
-});
+} as const;
+export type Language = keyof typeof translations;
