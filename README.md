@@ -1,6 +1,6 @@
 # Airflow Git Sync
 
-🌐 Website / Documentation: https://Enzzo657.github.io/airflow-git-sync/
+🌐 Website / Documentation: https://opsmon.github.io/airflow-git-sync/
 
 🎉 What if you could instantly sync DAG changes from **Git** to **Airflow** without manually restarting the airflow services?
 
