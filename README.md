@@ -1,9 +1,13 @@
 # Airflow Git Sync
 
+🌐 Website / Documentation: https://Enzzo657.github.io/airflow-git-sync/
+
+Website development: [Svelte setup and commands](docs/README.md).
+
 🎉 What if you could instantly sync DAG changes from **Git** to **Airflow** without manually restarting the airflow services?
 
-<p align=center>
-    <img src="images/git_sync.jpg" width="450" height="200" alt="airflow git sync"/>
+<p align="center">
+    <img src="images/git-airflow-sync.png" width="800" alt="Git repository synchronized to Apache Airflow"/>
 </p>
 
 
